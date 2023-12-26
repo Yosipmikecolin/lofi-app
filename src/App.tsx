@@ -73,16 +73,16 @@ function App() {
           </audio>
 
           <div className="container-progress">
-            <div className="disc" onClick={toggleReproduccion}>
-            <img src={music.post}/>
+            <div className={reproduciendo ? "disc-play" : "disc-pause"} onClick={toggleReproduccion}>
+              <img src={music.post} />
+            </div>
+
+            <div className="progress" onClick={handleProgressBarClick}>
+              <div style={{ width: `${progreso}%`, height: "100%", backgroundColor: "orange", borderRadius: 3 }} />
+            </div>
+
           </div>
 
-          <div className="progress" onClick={handleProgressBarClick}>
-            <div style={{ width: `${progreso}%`, height: "100%", backgroundColor: "orange",borderRadius:3 }} />
-          </div>
-
-          </div>
-   
         </section>
       }
 
