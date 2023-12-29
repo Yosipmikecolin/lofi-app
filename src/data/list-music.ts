@@ -132,5 +132,35 @@ export const listMusic = [
         "name_user": "Pro ciber",
         "music": Music1
 
+    },
+    {
+
+        "id": 13,
+        "name_music": "Musica ambiental",
+        "post": Post1,
+        "icon_user": User1,
+        "name_user": "Pro ciber",
+        "music": Music1
+
+    },
+    {
+
+        "id": 14,
+        "name_music": "Musica ambiental",
+        "post": Post1,
+        "icon_user": User1,
+        "name_user": "Pro ciber",
+        "music": Music1
+
+    },
+    {
+
+        "id": 15,
+        "name_music": "Musica ambiental",
+        "post": Post1,
+        "icon_user": User1,
+        "name_user": "Pro ciber",
+        "music": Music1
+
     }
 ]

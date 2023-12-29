@@ -1,5 +1,7 @@
 import { listMusic } from "./data/list-music"
 import IconPlay from "./assets/icon-play.png"
+import IconMin from "./assets/minimizar.png"
+import IconClose from "./assets/close.png"
 import './App.css'
 import { useMusic } from "./hooks/use-music"
 import { Music } from "./interfaces/music"
@@ -7,7 +9,7 @@ import { useEffect, useState } from "react"
 
 function App() {
 
-  const { music, setMusic } = useMusic()
+  const { music, setMusic, removeMusic } = useMusic()
   const [progreso, setProgreso] = useState(0);
   const [reproduciendo, setReproduciendo] = useState(true);
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
@@ -19,6 +21,10 @@ function App() {
   const toggleReproduccion = () => {
     setReproduciendo(!reproduciendo);
   };
+
+  const closeMusic = () => {
+    removeMusic()
+  }
 
   useEffect(() => {
     if (audioElement) {
@@ -81,12 +87,29 @@ function App() {
               <div style={{ width: `${progreso}%`, height: "100%", backgroundColor: "orange", borderRadius: 3 }} />
             </div>
 
+            <div className="actions-control">
+              <img src={IconMin} width={15} />
+              <img src={IconClose} width={25} onClick={closeMusic} />
+            </div>
           </div>
+
 
         </section>
       }
 
       <section className='container-app'>
+        {music &&
+          <div className="disc-mini">
+            <div className={reproduciendo ? "disc-play" : "disc-pause"} onClick={toggleReproduccion}>
+              <img src={music.post} />
+            </div>
+            <div className="actions">
+              <h3>Lofi</h3>
+              <h3>Lofi</h3>
+            </div>
+          </div>
+        }
+
         {listMusic.map((item) => (
           <div className="container-card">
             <div className='card' key={item.id}>

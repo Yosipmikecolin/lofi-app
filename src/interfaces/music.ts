@@ -10,4 +10,5 @@ export interface Music {
 export interface hookMusic {
     music?: Music;
     setMusic: (music: Music) => void;
+    removeMusic: () => void;
 }
