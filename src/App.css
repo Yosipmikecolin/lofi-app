@@ -20,13 +20,12 @@
   right: 30px;
   top: 30px;
   padding: 10px;
-  width: 80px;
+  padding-top: 20px;
+  width: auto;
   border-radius: 10px;
-  cursor: pointer;
   transition: 500ms ease;
   display: flex;
   align-items: center;
-
 }
 
 .disc-mini .actions {
@@ -35,9 +34,23 @@
   margin-left: 10px;
 }
 
-.disc-mini:hover {
-  width: 300px;
-  transition: 500ms ease;
+.disc-mini .actions > .header {
+  position: absolute;
+  right: 10px;
+  top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+.disc-mini .actions > h3 {
+  margin-top: 10px;
+}
+
+.disc-mini .actions > .buttons {
+  font-size: 30px;
+  position: relative;
+  right: 5px;
 }
 
 .container-card {
@@ -45,7 +58,6 @@
   flex-direction: column;
   gap: 10px;
   margin-top: 20px;
-
 }
 
 .card {
@@ -68,7 +80,7 @@
   transition: 500ms ease;
 }
 
-.card-hover>img {
+.card-hover > img {
   cursor: pointer;
 }
 
@@ -136,7 +148,16 @@ audio {
   gap: 20px;
   height: 100px;
   padding: 20px;
+}
 
+.container-progress .buttons {
+  font-size: 30px;
+  color: white;
+  display: flex;
+}
+
+.buttons > * {
+  cursor: pointer;
 }
 
 .disc-play {
@@ -144,13 +165,7 @@ audio {
   height: 60px;
   border-radius: 100%;
   animation: rotacionInfinita 5s linear infinite;
-}
-
-.disc-pause {
-  width: 60px;
-  height: 60px;
-  border-radius: 100%;
-  animation-play-state: paused;
+  cursor: pointer;
 }
 
 @keyframes rotacionInfinita {
@@ -163,14 +178,14 @@ audio {
   }
 }
 
-.disc-play>img {
+.disc-play > img {
   object-fit: cover;
   width: 100%;
   height: 100%;
   border-radius: 100%;
 }
 
-.disc-pause>img {
+.disc-pause > img {
   object-fit: cover;
   width: 100%;
   height: 100%;
@@ -185,7 +200,7 @@ audio {
   cursor: pointer;
 }
 
-@media (max-width:649px) {
+@media (max-width: 649px) {
   .container-app {
     width: 100%;
   }

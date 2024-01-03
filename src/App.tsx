@@ -1,120 +1,195 @@
-import { listMusic } from "./data/list-music"
-import IconPlay from "./assets/icon-play.png"
-import IconMin from "./assets/minimizar.png"
-import IconClose from "./assets/close.png"
-import './App.css'
-import { useMusic } from "./hooks/use-music"
-import { Music } from "./interfaces/music"
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
+import { listMusic } from "./data/list-music";
+import IconPlay from "./assets/icon-play.png";
+import IconMin from "./assets/minimizar.png";
+import IconClose from "./assets/close.png";
+import IconMin2 from "./assets/minimizar-2.png";
+import IconClose2 from "./assets/close-2.png";
+import "./App.css";
+import "animate.css";
+import { useMusic } from "./hooks/use-music";
+import { Music } from "./interfaces/music";
+import {
+  BiCaretLeft,
+  BiCaretRight,
+  BiPauseCircle,
+  BiPlayCircle,
+} from "react-icons/bi";
 
 function App() {
-
-  const { music, setMusic, removeMusic } = useMusic()
-  const [progreso, setProgreso] = useState(0);
-  const [reproduciendo, setReproduciendo] = useState(true);
-  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
+  const { music, setMusic, removeMusic } = useMusic();
+  const [progress, setProgress] = useState(0);
+  const [playing, setPlaying] = useState(true);
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(
+    null
+  );
+  const [activeMinimizar, setActiveMinimizar] = useState(false);
 
   const handleMusic = (music: Music) => {
-    setMusic(music)
-  }
+    setMusic(music);
+  };
 
   const toggleReproduccion = () => {
-    setReproduciendo(!reproduciendo);
+    setPlaying(!playing);
   };
 
   const closeMusic = () => {
-    removeMusic()
-  }
+    removeMusic();
+    setActiveMinimizar(false);
+  };
+
+  const viewMusic = () => {
+    setActiveMinimizar((prev) => !prev);
+  };
 
   useEffect(() => {
     if (audioElement) {
-      if (reproduciendo) {
+      if (playing) {
         audioElement.play();
       } else {
         audioElement.pause();
       }
 
       const handleTimeUpdate = () => {
-        const nuevoProgreso = (audioElement.currentTime / audioElement.duration) * 100;
-        setProgreso(nuevoProgreso);
+        const nuevoProgreso =
+          (audioElement.currentTime / audioElement.duration) * 100;
+        setProgress(nuevoProgreso);
       };
 
-      audioElement.addEventListener('timeupdate', handleTimeUpdate);
+      audioElement.addEventListener("timeupdate", handleTimeUpdate);
 
       return () => {
-        audioElement.removeEventListener('timeupdate', handleTimeUpdate);
+        audioElement.removeEventListener("timeupdate", handleTimeUpdate);
       };
     }
-  }, [reproduciendo, audioElement]);
-
-
+  }, [playing, audioElement]);
 
   const handleLoadedMetadata = () => {
-    setProgreso(0);
+    setProgress(0);
   };
 
-  const actualizarProgreso = (nuevoProgreso: number) => {
-    setProgreso(nuevoProgreso);
+  const updatedProgress = (nuevoProgreso: number) => {
+    setProgress(nuevoProgreso);
     if (audioElement) {
       const nuevoTiempo = (nuevoProgreso / 100) * audioElement.duration;
       audioElement.currentTime = nuevoTiempo;
     }
   };
 
-
-  const handleProgressBarClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const handleProgressBarClick = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
     const barraProgreso = event.currentTarget;
     const clicX = event.clientX - barraProgreso.getBoundingClientRect().left;
     const nuevoProgreso = (clicX / barraProgreso.clientWidth) * 100;
-    actualizarProgreso(nuevoProgreso);
+    updatedProgress(nuevoProgreso);
   };
 
   return (
-
     <>
-      {music &&
-        <section className="control-music">
-          <audio controls autoPlay={true} onLoadedMetadata={handleLoadedMetadata} ref={(audio) => setAudioElement(audio)}>
+      {music && (
+        <section
+          className={`control-music animate__animated ${
+            activeMinimizar ? "animate__fadeOutUp" : "animate__fadeInUp"
+          }`}
+        >
+          <audio
+            controls
+            autoPlay={true}
+            onLoadedMetadata={handleLoadedMetadata}
+            ref={(audio) => setAudioElement(audio)}
+          >
             <source src={music.music} type="audio/mp3" />
           </audio>
 
           <div className="container-progress">
-            <div className={reproduciendo ? "disc-play" : "disc-pause"} onClick={toggleReproduccion}>
+            <div
+              className="disc-play"
+              style={{
+                animationPlayState: playing ? "running" : "paused",
+              }}
+            >
               <img src={music.post} />
+            </div>
+
+            <div className="buttons">
+              <BiCaretLeft />
+              {playing ? (
+                <BiPauseCircle onClick={toggleReproduccion} />
+              ) : (
+                <BiPlayCircle onClick={toggleReproduccion} />
+              )}
+              <BiCaretRight />
             </div>
 
             <div className="progress" onClick={handleProgressBarClick}>
-              <div style={{ width: `${progreso}%`, height: "100%", backgroundColor: "orange", borderRadius: 3 }} />
+              <div
+                style={{
+                  width: `${progress}%`,
+                  height: "100%",
+                  backgroundColor: "orange",
+                  borderRadius: 3,
+                }}
+              />
             </div>
 
             <div className="actions-control">
-              <img src={IconMin} width={15} />
+              <img src={IconMin} width={15} height={20} onClick={viewMusic} />
               <img src={IconClose} width={25} onClick={closeMusic} />
             </div>
           </div>
-
-
         </section>
-      }
+      )}
 
-      <section className='container-app'>
-        {music &&
-          <div className="disc-mini">
-            <div className={reproduciendo ? "disc-play" : "disc-pause"} onClick={toggleReproduccion}>
+      <section className="container-app">
+        {activeMinimizar && music && (
+          <div
+            className={`disc-mini animate__animated ${
+              activeMinimizar && "animate__fadeInDown"
+            }`}
+          >
+            <div
+              className={"disc-play"}
+              style={{
+                animationPlayState: playing ? "running" : "paused",
+              }}
+            >
               <img src={music.post} />
             </div>
             <div className="actions">
-              <h3>Lofi</h3>
-              <h3>Lofi</h3>
+              <div className="header">
+                <img
+                  src={IconMin2}
+                  width={15}
+                  height={20}
+                  onClick={viewMusic}
+                />
+                <img src={IconClose2} width={15} onClick={closeMusic} />
+              </div>
+
+              <h3>{music.name_music}</h3>
+              <div className="buttons">
+                <BiCaretLeft />
+                {playing ? (
+                  <BiPauseCircle onClick={toggleReproduccion} />
+                ) : (
+                  <BiPlayCircle onClick={toggleReproduccion} />
+                )}
+                <BiCaretRight />
+              </div>
             </div>
           </div>
-        }
+        )}
 
         {listMusic.map((item) => (
           <div className="container-card">
-            <div className='card' key={item.id}>
+            <div className="card" key={item.id}>
               <div className="card-hover">
-                <img src={IconPlay} width={50} onClick={() => handleMusic(item)} />
+                <img
+                  src={IconPlay}
+                  width={50}
+                  onClick={() => handleMusic(item)}
+                />
               </div>
               <img src={item.post} className="image" />
             </div>
@@ -126,12 +201,10 @@ function App() {
               </div>
             </div>
           </div>
-
         ))}
       </section>
     </>
-
-  )
+  );
 }
 
-export default App
+export default App;
