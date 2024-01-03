@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { listMusic } from "./data/list-music";
 import IconPlay from "./assets/icon-play.png";
+import IconPause from "./assets/icon-pausa.png";
 import IconMin from "./assets/minimizar.png";
 import IconClose from "./assets/close.png";
 import IconMin2 from "./assets/minimizar-2.png";
@@ -185,11 +186,21 @@ function App() {
           <div className="container-card">
             <div className="card" key={item.id}>
               <div className="card-hover">
-                <img
-                  src={IconPlay}
-                  width={50}
-                  onClick={() => handleMusic(item)}
-                />
+                {!music ? (
+                  <img
+                    src={IconPlay}
+                    width={50}
+                    onClick={() => handleMusic(item)}
+                  />
+                ) : playing && music.id === item.id ? (
+                  <img
+                    src={IconPause}
+                    width={50}
+                    onClick={toggleReproduccion}
+                  />
+                ) : (
+                  <img src={IconPlay} width={50} onClick={toggleReproduccion} />
+                )}
               </div>
               <img src={item.post} className="image" />
             </div>
