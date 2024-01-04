@@ -29,6 +29,7 @@ function App() {
   const handleMusic = (selectedMusic: Music) => {
     if (audioElement) {
       audioElement.pause();
+      audioElement.remove();
       audioElement.currentTime = 0;
     }
 
@@ -37,12 +38,50 @@ function App() {
     newAudioElement.autoplay = true;
 
     setAudioElement(newAudioElement);
-
+    setPlaying(true);
     setMusic(selectedMusic);
   };
 
   const toggleReproduccion = () => {
     setPlaying(!playing);
+  };
+
+  const nextMusic = () => {
+    if (audioElement) {
+      audioElement.pause();
+      audioElement.remove();
+      audioElement.currentTime = 0;
+    }
+
+    const index = music ? listMusic.indexOf(music) : 0;
+    const selectedMusic = listMusic[index + 1 > 15 ? 0 : index + 1];
+    const newAudioElement = new Audio(selectedMusic.music);
+    newAudioElement.onloadedmetadata = handleLoadedMetadata;
+    newAudioElement.autoplay = true;
+
+    setAudioElement(newAudioElement);
+    setPlaying(true);
+    setMusic(selectedMusic);
+  };
+
+  const prevMusic = () => {
+    if (audioElement) {
+      audioElement.pause();
+      audioElement.remove();
+      audioElement.currentTime = 0;
+    }
+
+    const index = (music ? listMusic.indexOf(music) : 0) - 1;
+    const selectedMusic = listMusic[index <= 0 ? 15 : index];
+    if (selectedMusic) {
+      const newAudioElement = new Audio(selectedMusic.music);
+      newAudioElement.onloadedmetadata = handleLoadedMetadata;
+      newAudioElement.autoplay = true;
+
+      setAudioElement(newAudioElement);
+      setPlaying(true);
+      setMusic(selectedMusic);
+    }
   };
 
   const closeMusic = () => {
@@ -57,6 +96,27 @@ function App() {
 
   const viewMusic = () => {
     setActiveMinimizar((prev) => !prev);
+  };
+
+  const handleLoadedMetadata = () => {
+    setProgress(0);
+  };
+
+  const updatedProgress = (nuevoProgreso: number) => {
+    setProgress(nuevoProgreso);
+    if (audioElement) {
+      const nuevoTiempo = (nuevoProgreso / 100) * audioElement.duration;
+      audioElement.currentTime = nuevoTiempo;
+    }
+  };
+
+  const handleProgressBarClick = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
+    const barraProgreso = event.currentTarget;
+    const clicX = event.clientX - barraProgreso.getBoundingClientRect().left;
+    const nuevoProgreso = (clicX / barraProgreso.clientWidth) * 100;
+    updatedProgress(nuevoProgreso);
   };
 
   useEffect(() => {
@@ -81,26 +141,11 @@ function App() {
     }
   }, [playing, audioElement]);
 
-  const handleLoadedMetadata = () => {
-    setProgress(0);
-  };
-
-  const updatedProgress = (nuevoProgreso: number) => {
-    setProgress(nuevoProgreso);
-    if (audioElement) {
-      const nuevoTiempo = (nuevoProgreso / 100) * audioElement.duration;
-      audioElement.currentTime = nuevoTiempo;
+  useEffect(() => {
+    if (progress === 100) {
+      nextMusic();
     }
-  };
-
-  const handleProgressBarClick = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => {
-    const barraProgreso = event.currentTarget;
-    const clicX = event.clientX - barraProgreso.getBoundingClientRect().left;
-    const nuevoProgreso = (clicX / barraProgreso.clientWidth) * 100;
-    updatedProgress(nuevoProgreso);
-  };
+  }, [progress]);
 
   return (
     <>
@@ -111,25 +156,28 @@ function App() {
           }`}
         >
           <source src={music.music} type="audio/mp3" />
-
           <div className="container-progress">
-            <div
-              className="disc-play"
-              style={{
-                animationPlayState: playing ? "running" : "paused",
-              }}
-            >
-              <img src={music.post} />
-            </div>
+            {music && playing && progress === 0 ? (
+              <div className="disc-play-loader"></div>
+            ) : (
+              <div
+                className="disc-play"
+                style={{
+                  animationPlayState: playing ? "running" : "paused",
+                }}
+              >
+                <img src={music.post} />
+              </div>
+            )}
 
             <div className="buttons">
-              <BiCaretLeft />
+              <BiCaretLeft onClick={prevMusic} />
               {playing ? (
                 <BiPauseCircle onClick={toggleReproduccion} />
               ) : (
                 <BiPlayCircle onClick={toggleReproduccion} />
               )}
-              <BiCaretRight />
+              <BiCaretRight onClick={nextMusic} />
             </div>
 
             <div className="progress" onClick={handleProgressBarClick}>
@@ -179,13 +227,13 @@ function App() {
 
               <h3>{music.name_music}</h3>
               <div className="buttons">
-                <BiCaretLeft />
+                <BiCaretLeft onClick={prevMusic} />
                 {playing ? (
                   <BiPauseCircle onClick={toggleReproduccion} />
                 ) : (
                   <BiPlayCircle onClick={toggleReproduccion} />
                 )}
-                <BiCaretRight />
+                <BiCaretRight onClick={nextMusic} />
               </div>
             </div>
           </div>
