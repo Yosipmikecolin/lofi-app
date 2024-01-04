@@ -21,13 +21,24 @@ function App() {
   const { music, setMusic, removeMusic } = useMusic();
   const [progress, setProgress] = useState(0);
   const [playing, setPlaying] = useState(true);
+  const [activeMinimizar, setActiveMinimizar] = useState(false);
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(
     null
   );
-  const [activeMinimizar, setActiveMinimizar] = useState(false);
 
-  const handleMusic = (music: Music) => {
-    setMusic(music);
+  const handleMusic = (selectedMusic: Music) => {
+    if (audioElement) {
+      audioElement.pause();
+      audioElement.currentTime = 0;
+    }
+
+    const newAudioElement = new Audio(selectedMusic.music);
+    newAudioElement.onloadedmetadata = handleLoadedMetadata;
+    newAudioElement.autoplay = true;
+
+    setAudioElement(newAudioElement);
+
+    setMusic(selectedMusic);
   };
 
   const toggleReproduccion = () => {
@@ -36,7 +47,12 @@ function App() {
 
   const closeMusic = () => {
     removeMusic();
+    setAudioElement(null);
     setActiveMinimizar(false);
+    if (audioElement) {
+      audioElement.pause();
+      audioElement.currentTime = 0;
+    }
   };
 
   const viewMusic = () => {
@@ -94,14 +110,7 @@ function App() {
             activeMinimizar ? "animate__fadeOutUp" : "animate__fadeInUp"
           }`}
         >
-          <audio
-            controls
-            autoPlay={true}
-            onLoadedMetadata={handleLoadedMetadata}
-            ref={(audio) => setAudioElement(audio)}
-          >
-            <source src={music.music} type="audio/mp3" />
-          </audio>
+          <source src={music.music} type="audio/mp3" />
 
           <div className="container-progress">
             <div
@@ -183,27 +192,39 @@ function App() {
         )}
 
         {listMusic.map((item) => (
-          <div className="container-card">
-            <div className="card" key={item.id}>
-              <div className="card-hover">
-                {!music ? (
+          <div className="container-card" key={item.id}>
+            {item.id === music?.id ? (
+              <div className="card">
+                <div className="card-hover">
+                  {playing ? (
+                    <img
+                      src={IconPause}
+                      width={50}
+                      onClick={toggleReproduccion}
+                    />
+                  ) : (
+                    <img
+                      src={IconPlay}
+                      width={50}
+                      onClick={toggleReproduccion}
+                    />
+                  )}
+                </div>
+                <img src={item.post} className="image" />
+              </div>
+            ) : (
+              <div className="card">
+                <div className="card-hover">
                   <img
                     src={IconPlay}
                     width={50}
                     onClick={() => handleMusic(item)}
                   />
-                ) : playing && music.id === item.id ? (
-                  <img
-                    src={IconPause}
-                    width={50}
-                    onClick={toggleReproduccion}
-                  />
-                ) : (
-                  <img src={IconPlay} width={50} onClick={toggleReproduccion} />
-                )}
+                </div>
+                <img src={item.post} className="image" />
               </div>
-              <img src={item.post} className="image" />
-            </div>
+            )}
+
             <div className="info">
               <img src={item.icon_user} className="image-icon" />
               <div className="title">
